@@ -1,4 +1,5 @@
 import { auth } from "../../auth";
+import InvitePartner from "./components/InvitePartner";
 import SignIn from "./components/SignIn";
 import SignOut from "./components/SignOut";
 
@@ -9,11 +10,16 @@ export default async function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         {!session && <SignIn />}
         {session && (
-          <div>
-            <p>Signed in as {session.user?.email}</p>
+          <div className="flex gap-2 items-center">
+            <p className="text-sm">Signed in as {session.user?.email}</p>
             <SignOut />
           </div>
         )}
+        <h1 className="text-3xl">CoupleMDB</h1>
+        <p className="text-lg text-center sm:text-left">
+          Track your couple movie experiences.
+        </p>
+        {session && <InvitePartner />}
       </main>
     </div>
   );
