@@ -85,3 +85,12 @@ export const authenticators = sqliteTable(
     }),
   ]
 )
+
+export const coupleInvitations = sqliteTable(
+  "coupleInvitation", 
+  {
+    inviterId: text("inviterId").notNull().references(() => users.id, { onDelete: "cascade"}),
+    inviteeId: text("inviteeId").notNull().references(() => users.id, { onDelete: "cascade"}),
+    status: text("status").notNull(),
+  }
+)
