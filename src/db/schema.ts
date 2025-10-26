@@ -1,6 +1,7 @@
 import { integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core"
 import { drizzle } from "drizzle-orm/libsql"
 import type { AdapterAccountType } from "next-auth/adapters"
+import { create } from "domain";
  
 export const db = drizzle({ connection: {
   url: process.env.DATABASE_URL!, 
@@ -89,6 +90,7 @@ export const authenticators = sqliteTable(
 export const coupleInvitations = sqliteTable(
   "coupleInvitation", 
   {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
     inviterId: text("inviterId").notNull().references(() => users.id, { onDelete: "cascade"}),
     inviteeId: text("inviteeId").notNull().references(() => users.id, { onDelete: "cascade"}),
     status: text("status").notNull(),

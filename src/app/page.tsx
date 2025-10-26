@@ -1,8 +1,10 @@
 import { auth } from "../../auth";
 import { getInvitationForUser } from "./actions";
+import Invited from "./components/Invited";
 import InvitePartner from "./components/InvitePartner";
 import SignIn from "./components/SignIn";
 import SignOut from "./components/SignOut";
+import { InviteStatus } from "./helpers/InviteStatus";
 
 export default async function Home() {
   const session = await auth();
@@ -22,16 +24,24 @@ export default async function Home() {
           Track your couple movie experiences.
         </p>
         {session && !invitation && <InvitePartner />}
-        {session && invitation && (
-          <div>
-            {invitation.inviterId === session.user?.id ? (
-              <p>You have invited your partner! Waiting for them to accept.</p>
-            ) : (
-              <p>Your partner has invited you! Please click below to accept!</p>
-              // Todo: Add accept/reject invite
-            )}
-          </div>
-        )}
+        {session &&
+          invitation &&
+          invitation.status === InviteStatus.Invited && (
+            <div>
+              {invitation.inviterId === session.user?.id ? (
+                <p>
+                  You have invited your partner! Waiting for them to accept.
+                </p>
+              ) : (
+                <Invited />
+              )}
+            </div>
+          )}
+        {session &&
+          invitation &&
+          invitation.status === InviteStatus.Accepted && (
+            <p>Your partnership is active! Enjoy tracking your movies!</p>
+          )}
       </main>
     </div>
   );

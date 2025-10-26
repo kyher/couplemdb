@@ -87,3 +87,46 @@ export async function getInvitationForUser(userId: string) {
 
   return invitation[0];
 }
+
+export async function acceptInvitationAction() {
+  const currentAuth = await auth();
+  const currentUser = currentAuth?.user;
+
+  if (!currentUser) {
+    return;
+  }
+
+  const invitation = await db.select().from(coupleInvitations)
+    .where(
+      eq(coupleInvitations.inviteeId, currentUser.id as string)
+    ).limit(1);
+
+  if (invitation.length === 0) {
+    return;
+  }
+
+  await db.update(coupleInvitations)
+    .set({ status: InviteStatus.Accepted })
+    .where(eq(coupleInvitations.id, invitation[0].id));
+}
+
+export async function rejectInvitationAction() {
+  const currentAuth = await auth();
+  const currentUser = currentAuth?.user;
+
+  if (!currentUser) {
+    return;
+  }
+
+  const invitation = await db.select().from(coupleInvitations)
+    .where(
+      eq(coupleInvitations.inviteeId, currentUser.id as string)
+    ).limit(1);
+
+  if (invitation.length === 0) {
+    return;
+  }
+
+  await db.delete(coupleInvitations)
+    .where(eq(coupleInvitations.id, invitation[0].id));
+}

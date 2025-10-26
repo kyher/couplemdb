@@ -1,3 +1,4 @@
 export enum InviteStatus {
-  Invited = 'invited'
+  Invited = 'invited',
+  Accepted = 'accepted'
 }
