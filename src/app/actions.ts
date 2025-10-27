@@ -4,6 +4,7 @@ import { eq, or } from "drizzle-orm";
 import z from "zod";
 import { auth } from "../../auth";
 import { InviteStatus } from "./helpers/InviteStatus";
+import { revalidatePath } from "next/cache";
 
 export async function inviteAction(initialState: any, formData: FormData) {
     const currentAuth = await auth();
@@ -74,6 +75,8 @@ export async function inviteAction(initialState: any, formData: FormData) {
       inviteeId: userToInvite[0].id,
       status: InviteStatus.Invited
     });
+
+    revalidatePath("/");
   } 
 
 export async function getInvitationForUser(userId: string) {
@@ -108,6 +111,8 @@ export async function acceptInvitationAction() {
   await db.update(coupleInvitations)
     .set({ status: InviteStatus.Accepted })
     .where(eq(coupleInvitations.id, invitation[0].id));
+
+    revalidatePath("/");
 }
 
 export async function rejectInvitationAction() {
@@ -129,4 +134,6 @@ export async function rejectInvitationAction() {
 
   await db.delete(coupleInvitations)
     .where(eq(coupleInvitations.id, invitation[0].id));
+    
+    revalidatePath("/");
 }
