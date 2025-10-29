@@ -1,48 +1,37 @@
+import Link from "next/link";
 import { auth } from "../../auth";
 import { getInvitationForUser } from "./actions";
 import Invited from "./components/Invited";
 import InvitePartner from "./components/InvitePartner";
-import SignIn from "./components/SignIn";
-import SignOut from "./components/SignOut";
 import { InviteStatus } from "./helpers/InviteStatus";
+import Header from "./components/Header";
 
 export default async function Home() {
   const session = await auth();
   const invitation = await getInvitationForUser(session?.user?.id || "");
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        {!session && <SignIn />}
-        {session && (
-          <div className="flex gap-2 items-center">
-            <p className="text-sm">Signed in as {session.user?.email}</p>
-            <SignOut />
-          </div>
-        )}
-        <h1 className="text-3xl">CoupleMDB</h1>
-        <p className="text-lg text-center sm:text-left">
-          Track your couple movie experiences.
-        </p>
-        {session && !invitation && <InvitePartner />}
-        {session &&
-          invitation &&
-          invitation.status === InviteStatus.Invited && (
-            <div>
-              {invitation.inviterId === session.user?.id ? (
-                <p>
-                  You have invited your partner! Waiting for them to accept.
-                </p>
-              ) : (
-                <Invited />
-              )}
-            </div>
+    <>
+      <Header session={session} />
+      {session && !invitation && <InvitePartner />}
+      {session && invitation && invitation.status === InviteStatus.Invited && (
+        <div>
+          {invitation.inviterId === session.user?.id ? (
+            <p>You have invited your partner! Waiting for them to accept.</p>
+          ) : (
+            <Invited />
           )}
-        {session &&
-          invitation &&
-          invitation.status === InviteStatus.Accepted && (
-            <p>Your partnership is active! Enjoy tracking your movies!</p>
-          )}
-      </main>
-    </div>
+        </div>
+      )}
+      {session && invitation && invitation.status === InviteStatus.Accepted && (
+        <div>
+          <Link
+            href="/add-movie"
+            className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700"
+          >
+            Add movie
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
