@@ -96,3 +96,32 @@ export const coupleInvitations = sqliteTable(
     status: text("status").notNull(),
   }
 )
+
+export const couples = sqliteTable(
+  "couple",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userAId: text("userAId").notNull().references(() => users.id, { onDelete: "cascade"}),
+    userBId: text("userBId").notNull().references(() => users.id, { onDelete: "cascade"}),
+  }
+)
+
+export const movies = sqliteTable(
+  "movie",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    coupleId: text("coupleId").notNull().references(() => couples.id, { onDelete: "cascade"}),
+    title: text("title").notNull(),
+  }
+)
+
+export const movieReviews = sqliteTable(
+  "movieReview",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    movieId: text("movieId").notNull().references(() => movies.id, { onDelete: "cascade"}),
+    reviewerId: text("reviewerId").notNull().references(() => users.id, { onDelete: "cascade"}),
+    rating: integer("rating").notNull(),
+    reviewText: text("reviewText"),
+  }
+)

@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { auth } from "../../auth";
-import { getInvitationForUser } from "./actions";
+import { getCoupleIdForUser, getInvitationForUser } from "./actions";
 import Invited from "./components/Invited";
 import InvitePartner from "./components/InvitePartner";
 import { InviteStatus } from "./helpers/InviteStatus";
 import Header from "./components/Header";
+import MovieList from "./components/MovieList";
 
 export default async function Home() {
   const session = await auth();
   const invitation = await getInvitationForUser(session?.user?.id || "");
+  const coupleId =
+    invitation && invitation.status === InviteStatus.Accepted
+      ? await getCoupleIdForUser(session!.user!.id!)
+      : null;
   return (
     <>
       <Header session={session} />
@@ -22,16 +27,20 @@ export default async function Home() {
           )}
         </div>
       )}
-      {session && invitation && invitation.status === InviteStatus.Accepted && (
-        <div>
-          <Link
-            href="/add-movie"
-            className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700"
-          >
-            Add movie
-          </Link>
-        </div>
-      )}
+      {session &&
+        invitation &&
+        invitation.status === InviteStatus.Accepted &&
+        coupleId && (
+          <div>
+            <Link
+              href="/add-movie"
+              className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700"
+            >
+              Add movie
+            </Link>
+            <MovieList coupleId={coupleId} />
+          </div>
+        )}
     </>
   );
 }

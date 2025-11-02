@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "../../../auth";
 import Header from "../components/Header";
+import AddMovie from "../components/AddMovie";
 
 export default async function Page() {
   const session = await auth();
@@ -14,6 +15,7 @@ export default async function Page() {
         Back
       </Link>
       <h2 className="text-xl">Add movie page</h2>
+      <AddMovie />
     </>
   );
 }

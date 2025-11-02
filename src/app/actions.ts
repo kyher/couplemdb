@@ -1,10 +1,11 @@
 'use server'
-import { coupleInvitations, db, users } from "@/db/schema";
+import { coupleInvitations, couples, db, movies, users } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import z from "zod";
 import { auth } from "../../auth";
 import { InviteStatus } from "./helpers/InviteStatus";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function inviteAction(initialState: any, formData: FormData) {
     const currentAuth = await auth();
@@ -112,6 +113,11 @@ export async function acceptInvitationAction() {
     .set({ status: InviteStatus.Accepted })
     .where(eq(coupleInvitations.id, invitation[0].id));
 
+  await db.insert(couples).values({
+    userAId: invitation[0].inviterId,
+    userBId: invitation[0].inviteeId
+  });
+
     revalidatePath("/");
 }
 
@@ -136,4 +142,71 @@ export async function rejectInvitationAction() {
     .where(eq(coupleInvitations.id, invitation[0].id));
     
     revalidatePath("/");
+}
+
+export async function addMovieAction(initialState: any, formData: FormData) {
+  const currentAuth = await auth();
+  const currentUser = currentAuth?.user;
+
+  if (!currentUser) {
+    return {
+      message: "Invalid auth state"
+    }
+  }
+
+  const couple = await db.select().from(couples)
+    .where(
+      or(
+        eq(couples.userAId, currentUser.id as string),
+        eq(couples.userBId, currentUser.id as string)
+      )
+    )
+    .limit(1);
+
+  if (couple.length === 0) {
+    return {
+      message: "You are not in a couple yet."
+    }
+  }
+
+  const AddMovieSchema = z.object({
+    title: z.string().min(1),
+  });
+
+  const parsedData = AddMovieSchema.safeParse({
+    title: formData.get("title")?.toString(),
+  });
+
+  if (!parsedData.success) {
+    return {
+      message: "Please enter a valid movie title."
+    }
+  }
+
+  await db.insert(movies).values({
+    title: parsedData.data.title,
+    coupleId: couple[0].id
+  });
+
+  redirect("/");
+}
+
+export async function getCoupleIdForUser(userId: string) {
+  const couple = await db.select().from(couples)
+    .where(
+      or(
+        eq(couples.userAId, userId),
+        eq(couples.userBId, userId)
+      )
+    )
+    .limit(1);
+    
+  return couple[0].id;
+}
+
+export async function getMovies(coupleId: string) {
+  const coupleMovies = await db.select().from(movies)
+    .where(eq(movies.coupleId, coupleId));
+    
+  return coupleMovies;
 }
