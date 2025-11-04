@@ -17,6 +17,12 @@ export default async function Home() {
   return (
     <>
       <Header session={session} />
+      {!session && (
+        <p>
+          Welcome to CoupleMDB - an application to track movie reviews for you
+          and your partner! Please sign in / register to continue.
+        </p>
+      )}
       {session && !invitation && <InvitePartner />}
       {session && invitation && invitation.status === InviteStatus.Invited && (
         <div>
