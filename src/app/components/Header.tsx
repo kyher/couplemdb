@@ -4,7 +4,7 @@ import SignOut from "./SignOut";
 
 export default function Header({ session }: { session: Session | null }) {
   return (
-    <>
+    <div className="border-b pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
       {!session && <SignIn />}
       {session && (
         <div className="flex gap-2 items-center">
@@ -16,6 +16,6 @@ export default function Header({ session }: { session: Session | null }) {
       <p className="text-lg text-center sm:text-left">
         Track your couple movie experiences.
       </p>
-    </>
+    </div>
   );
 }

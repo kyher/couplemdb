@@ -2,19 +2,15 @@ import Link from "next/link";
 import { auth } from "../../../auth";
 import Header from "../components/Header";
 import AddMovie from "../components/AddMovie";
+import BackLink from "../components/BackLink";
 
 export default async function Page() {
   const session = await auth();
   return (
     <>
       <Header session={session} />
-      <Link
-        href="/"
-        className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700 w-max"
-      >
-        Back
-      </Link>
-      <h2 className="text-xl">Add movie page</h2>
+      <BackLink href="/" />
+      <h2 className="text-xl">Add Movie</h2>
       <AddMovie />
     </>
   );

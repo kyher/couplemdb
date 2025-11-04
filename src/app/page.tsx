@@ -31,10 +31,10 @@ export default async function Home() {
         invitation &&
         invitation.status === InviteStatus.Accepted &&
         coupleId && (
-          <div>
+          <div className="flex flex-col gap-4">
             <Link
               href="/add-movie"
-              className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700"
+              className="bg-blue-600 p-2 rounded text-white hover:bg-blue-700 w-fit"
             >
               Add movie
             </Link>
