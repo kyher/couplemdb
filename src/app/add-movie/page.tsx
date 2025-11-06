@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { auth } from "../../../auth";
 import Header from "../components/Header";
 import AddMovie from "../components/AddMovie";

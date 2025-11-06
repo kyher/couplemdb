@@ -1,11 +1,12 @@
 'use server'
-import { coupleInvitations, couples, db, movies, users } from "@/db/schema";
+import { coupleInvitations, couples, movieReviews, movies, users } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import z from "zod";
 import { auth } from "../../auth";
 import { InviteStatus } from "./helpers/InviteStatus";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { db } from "@/db";
 
 export async function inviteAction(initialState: any, formData: FormData) {
     const currentAuth = await auth();
@@ -205,8 +206,66 @@ export async function getCoupleIdForUser(userId: string) {
 }
 
 export async function getMovies(coupleId: string) {
-  const coupleMovies = await db.select().from(movies)
-    .where(eq(movies.coupleId, coupleId));
+  const coupleMovies = await db.query.movies.findMany({
+    where: eq(movies.coupleId, coupleId),
+    with: {
+      movieReviews: true
+    }
+  })
     
   return coupleMovies;
+}
+
+export async function getMovie(movieId: string) {
+  return await db.query.movies.findFirst({
+    where: eq(movies.id, movieId)
+  })
+}
+
+export async function addReviewAction(initialState: any, formData: FormData) {
+
+  const currentAuth = await auth();
+  const currentUser = currentAuth?.user;
+
+  if (!currentUser) {
+    return {
+      message: "Invalid auth state"
+    }
+  }
+
+  const ReviewMovieSchema = z.object({
+    id: z.string(),
+    rating: z.coerce.number().min(1).max(5),
+    note: z.string().max(255).optional()
+  });
+
+  const parsedData = ReviewMovieSchema.safeParse({
+    id: formData.get("id"),
+    rating: formData.get("rating"),
+    note: formData.get("note")
+  });
+
+  if (!parsedData.success) {
+    console.log(parsedData.error);
+    return {
+      message: "Please enter a valid rating and note for your review"
+    }
+  }
+
+  const movie = await getMovie(parsedData.data.id);
+
+  if(!movie) {
+    return {
+      message: "Movie not found"
+    }
+  }
+
+  await db.insert(movieReviews).values({
+    movieId: movie.id,
+    reviewerId: currentUser.id as string,
+    rating: parsedData.data.rating,
+    reviewText: parsedData.data.note
+  })
+  
+  redirect('/')
 }

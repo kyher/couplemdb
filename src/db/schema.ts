@@ -1,14 +1,8 @@
+import { relations } from "drizzle-orm"
 import { integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core"
-import { drizzle } from "drizzle-orm/libsql"
 import type { AdapterAccountType } from "next-auth/adapters"
-import { create } from "domain";
  
-export const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL!, 
-  authToken: process.env.DATABASE_AUTH_TOKEN!
-}},);
- 
-export const users = sqliteTable("user", {
+ export const users = sqliteTable("user", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -115,6 +109,10 @@ export const movies = sqliteTable(
   }
 )
 
+export const moviesRelations = relations(movies, ({ many }) => ({
+	movieReviews: many(movieReviews),
+}));
+
 export const movieReviews = sqliteTable(
   "movieReview",
   {
@@ -124,4 +122,11 @@ export const movieReviews = sqliteTable(
     rating: integer("rating").notNull(),
     reviewText: text("reviewText"),
   }
-)
+) 
+
+export const movieReviewsRelations = relations(movieReviews, ({ one }) => ({
+	movie: one(movies, {
+		fields: [movieReviews.movieId],
+		references: [movies.id],
+	}),
+}));
