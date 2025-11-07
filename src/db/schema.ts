@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm"
+import { InferSelectModel, relations } from "drizzle-orm"
 import { integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core"
 import type { AdapterAccountType } from "next-auth/adapters"
  
@@ -130,3 +130,5 @@ export const movieReviewsRelations = relations(movieReviews, ({ one }) => ({
 		references: [movies.id],
 	}),
 }));
+
+export type MovieReview = InferSelectModel<typeof movieReviews>;

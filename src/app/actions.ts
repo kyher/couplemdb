@@ -218,7 +218,10 @@ export async function getMovies(coupleId: string) {
 
 export async function getMovie(movieId: string) {
   return await db.query.movies.findFirst({
-    where: eq(movies.id, movieId)
+    where: eq(movies.id, movieId),
+    with: {
+      movieReviews: true
+    }
   })
 }
 
@@ -266,6 +269,6 @@ export async function addReviewAction(initialState: any, formData: FormData) {
     rating: parsedData.data.rating,
     reviewText: parsedData.data.note
   })
-  
+
   redirect('/')
 }
