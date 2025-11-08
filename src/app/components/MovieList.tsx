@@ -1,35 +1,60 @@
 import Link from "next/link";
 import { getMovies } from "../actions";
 import MovieReviews from "./MovieReviews";
+import { auth } from "../../../auth";
+import { MovieReview } from "@/db/schema";
+import { get } from "http";
 
 export default async function MovieList({ coupleId }: { coupleId: string }) {
   const movies = await getMovies(coupleId);
+  const session = await auth();
+
+  function getUserReview(reviews: MovieReview[]) {
+    return reviews.find((review) => review.reviewerId === session?.user?.id);
+  }
+
+  function getPartnerReview(reviews: MovieReview[]) {
+    return reviews.find((review) => review.reviewerId !== session?.user?.id);
+  }
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-      {movies.map((movie) => (
-        <div key={movie.id} className="p-4 bg-gray-800 rounded mb-2">
-          <h2 className="text-lg font-semibold mb-2">{movie.title}</h2>
-          {movie.movieReviews.length > 0 && (
-            <MovieReviews reviews={movie.movieReviews} summary={true} />
-          )}
-          <div className="flex gap-2">
-            {!movie.movieReviews.length && (
+    <table>
+      <thead>
+        <tr>
+          <th className="text-left p-2">Title</th>
+          <th className="text-left p-2">Your review</th>
+          <th className="text-left p-2">Your Partner's review</th>
+          <th className="text-left p-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {movies.map((movie) => (
+          <tr key={movie.id} className="border-t border-gray-700">
+            <td className="p-2">{movie.title}</td>
+            <td className="p-2">
+              {getUserReview(movie.movieReviews)?.rating ?? "-"}
+            </td>
+            <td className="p-2">
+              {getPartnerReview(movie.movieReviews)?.rating ?? "-"}
+            </td>
+            <td className="p-2 flex gap-2">
+              {!movie.movieReviews.length && (
+                <Link
+                  href={`/movies/${movie.id}/add-review`}
+                  className=" bg-blue-600 p-2 rounded"
+                >
+                  Add a review
+                </Link>
+              )}
               <Link
-                href={`/movies/${movie.id}/add-review`}
-                className="bg-blue-600 p-2 rounded"
+                href={`/movies/${movie.id}`}
+                className="bg-orange-500 p-2 rounded"
               >
-                Add a review
+                View movie
               </Link>
-            )}
-            <Link
-              href={`/movies/${movie.id}`}
-              className="bg-orange-500 p-2 rounded"
-            >
-              View movie
-            </Link>
-          </div>
-        </div>
-      ))}
-    </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
