@@ -1,5 +1,6 @@
 import { MovieReview } from "@/db/schema";
 import { auth } from "../../../auth";
+import StarRating from "./StarRating";
 
 export default async function MovieReviews({
   reviews,
@@ -10,18 +11,18 @@ export default async function MovieReviews({
 }) {
   const session = await auth();
   return (
-    <>
+    <div className="flex gap-12">
       {reviews.map((review) => (
         <div key={review.id} className="my-4">
-          <>
+          <div>
             <p>
               {review.reviewerId === session?.user?.id
                 ? "Your "
                 : "Your Partner's "}{" "}
               rating
             </p>
-            <p className="font-bold">{review.rating}</p>
-          </>
+            <StarRating rating={review.rating} />
+          </div>
           {!summary && (
             <>
               <p>
@@ -35,6 +36,6 @@ export default async function MovieReviews({
           )}
         </div>
       ))}
-    </>
+    </div>
   );
 }

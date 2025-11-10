@@ -4,6 +4,7 @@ import MovieReviews from "./MovieReviews";
 import { auth } from "../../../auth";
 import { MovieReview } from "@/db/schema";
 import { get } from "http";
+import StarRating from "./StarRating";
 
 export default async function MovieList({ coupleId }: { coupleId: string }) {
   const movies = await getMovies(coupleId);
@@ -31,10 +32,14 @@ export default async function MovieList({ coupleId }: { coupleId: string }) {
           <tr key={movie.id} className="border-t border-gray-700">
             <td className="p-2">{movie.title}</td>
             <td className="p-2">
-              {getUserReview(movie.movieReviews)?.rating ?? "-"}
+              <StarRating
+                rating={getUserReview(movie.movieReviews)?.rating ?? 0}
+              />
             </td>
             <td className="p-2">
-              {getPartnerReview(movie.movieReviews)?.rating ?? "-"}
+              <StarRating
+                rating={getPartnerReview(movie.movieReviews)?.rating ?? 0}
+              />
             </td>
             <td className="p-2 flex gap-2">
               {!movie.movieReviews.length && (
