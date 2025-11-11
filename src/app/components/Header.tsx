@@ -1,11 +1,16 @@
 import { Session } from "next-auth";
 import SignIn from "./SignIn";
 import SignOut from "./SignOut";
+import Link from "next/link";
 
 export default function Header({ session }: { session: Session | null }) {
   return (
     <div className="border-b pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-      {!session && <SignIn />}
+      {!session && (
+        <Link href="/login" className="bg-blue-600 text-white p-2 rounded">
+          Sign in / Register
+        </Link>
+      )}
       {session && (
         <div className="flex gap-2 items-center">
           <p className="text-sm">Signed in as {session.user?.email}</p>
