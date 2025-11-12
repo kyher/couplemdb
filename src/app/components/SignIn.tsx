@@ -10,7 +10,7 @@ export default function SignIn() {
     >
       <button
         type="submit"
-        className="bg-blue-600 rounded p-2 text-sm text-white"
+        className="bg-blue-600 rounded p-2 text-sm text-white cursor-pointer hover:bg-blue-700"
       >
         Sign in with GitHub
       </button>

@@ -8,7 +8,10 @@ export default function SignOut() {
         await signOut();
       }}
     >
-      <button type="submit" className="bg-blue-600 rounded p-2 text-sm">
+      <button
+        type="submit"
+        className="bg-blue-600 rounded p-2 text-sm text-white cursor-pointer hover:bg-blue-700"
+      >
         Sign out
       </button>
     </form>
