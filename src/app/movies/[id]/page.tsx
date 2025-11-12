@@ -1,7 +1,7 @@
 import BackLink from "@/app/components/BackLink";
 import Header from "@/app/components/Header";
 import { auth } from "../../../../auth";
-import { getMovie } from "@/app/actions";
+import { getCoupleIdForUser, getMovie } from "@/app/actions";
 import MovieReviews from "@/app/components/MovieReviews";
 
 export default async function Page({
@@ -11,7 +11,23 @@ export default async function Page({
 }) {
   const session = await auth();
   const { id } = await params;
-  const movie = await getMovie(id);
+  if (!session?.user) {
+    return (
+      <>
+        <p>Not found</p>
+      </>
+    );
+  }
+  const coupleId = await getCoupleIdForUser(session.user.id!);
+  const movie = await getMovie(id, coupleId);
+  if (!movie) {
+    return (
+      <>
+        <p>Not found</p>
+      </>
+    );
+  }
+
   return (
     <>
       <Header session={session} />
