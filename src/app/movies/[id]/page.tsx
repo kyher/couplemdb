@@ -1,8 +1,9 @@
 import BackLink from "@/app/components/BackLink";
 import Header from "@/app/components/Header";
 import { auth } from "../../../../auth";
-import { getCoupleIdForUser, getMovie } from "@/app/actions";
+import { getCoupleIdForUser, getMovie, removeMovieAction } from "@/app/actions";
 import MovieReviews from "@/app/components/MovieReviews";
+import RemoveMovie from "@/app/components/RemoveMovie";
 
 export default async function Page({
   params,
@@ -36,6 +37,7 @@ export default async function Page({
       {movie && (
         <>
           <h2 className="text-xl">{movie.title}</h2>
+          <RemoveMovie movieId={movie.id} />
           <MovieReviews reviews={movie.movieReviews} summary={false} />
         </>
       )}

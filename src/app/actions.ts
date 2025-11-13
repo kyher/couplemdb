@@ -291,3 +291,41 @@ export async function addReviewAction(initialState: any, formData: FormData) {
 
   redirect("/");
 }
+
+export async function removeMovieAction(initialState: any, formData: FormData) {
+  const currentAuth = await auth();
+  const currentUser = currentAuth?.user;
+
+  if (!currentUser) {
+    return {
+      message: "Invalid auth state",
+    };
+  }
+  const coupleId = await getCoupleIdForUser(currentUser.id!);
+
+  const RemoveMovieSchema = z.object({
+    id: z.string(),
+  });
+
+  const parsedData = RemoveMovieSchema.safeParse({
+    id: formData.get("id"),
+  });
+
+  if (!parsedData.success) {
+    return {
+      message: "Invalid movie ID",
+    };
+  }
+
+  const movie = await getMovie(parsedData.data.id, coupleId);
+
+  if (!movie) {
+    return {
+      message: "Movie not found",
+    };
+  }
+
+  await db.delete(movies).where(eq(movies.id, movie.id));
+
+  redirect("/");
+}

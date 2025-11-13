@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { getMovies } from "../actions";
-import MovieReviews from "./MovieReviews";
 import { auth } from "../../../auth";
 import { MovieReview } from "@/db/schema";
-import { get } from "http";
 import StarRating from "./StarRating";
+import RemoveMovie from "./RemoveMovie";
 
 export default async function MovieList({ coupleId }: { coupleId: string }) {
   const movies = await getMovies(coupleId);
   const session = await auth();
-
   function getUserReview(reviews: MovieReview[]) {
     return reviews.find((review) => review.reviewerId === session?.user?.id);
   }
@@ -56,6 +54,7 @@ export default async function MovieList({ coupleId }: { coupleId: string }) {
               >
                 View movie
               </Link>
+              <RemoveMovie movieId={movie.id} />
             </td>
           </tr>
         ))}
